@@ -412,23 +412,32 @@ const AlertBanner = ({ type, icon, text, time, onDismiss }) => {
 /* ═══════════════════════════════════════════
    DASHBOARD
 ═══════════════════════════════════════════ */
+const DEFAULT_ALERTS = [
+  { id: 1, type: "critical", icon: "⚠️", text: "Torque spec issue – Zone B Row 28. Ahmed stopped work pending foreman review.", time: "09:47 · CRITICAL" },
+  { id: 2, type: "warn",     icon: "📦", text: "MC4 connector stock at 18%. Reorder 1,200 units before Monday.", time: "08:30 · MATERIALS" },
+  { id: 3, type: "info",     icon: "🌬️", text: "Wind advisory 3–5 PM. Pause crane lifts in Zone D.", time: "07:15 · WEATHER" },
+  { id: 4, type: "ok",       icon: "✅", text: "Zone A final inspection passed. Ready for interconnect sign-off.", time: "07:00 · COMPLETE" },
+];
+const DEFAULT_TASKS = [
+  { id:1, done:true,  active:false, urgent:false, text:"Morning safety tailgate – all crew", time:"07:00", p:"high" },
+  { id:2, done:true,  active:false, urgent:false, text:"Zone A punch list – final torque & QC sign-off", time:"09:30", p:"high" },
+  { id:3, done:false, active:true,  urgent:false, text:"Zone B string testing – strings 1–12", time:"NOW", p:"high" },
+  { id:4, done:false, active:true,  urgent:false, text:"Zone C panel install – target 200 panels by EOD", time:"NOW", p:"med" },
+  { id:5, done:false, active:false, urgent:true,  text:"Resolve torque issue Zone B Row 28", time:"URGENT", p:"high" },
+  { id:6, done:false, active:false, urgent:false, text:"Reorder confirmation – MC4 connectors (1,200 units)", time:"14:00", p:"med" },
+  { id:7, done:false, active:false, urgent:false, text:"EOD photo documentation – all active zones", time:"17:00", p:"low" },
+  { id:8, done:false, active:false, urgent:false, text:"Submit daily production report to PM", time:"17:30", p:"low" },
+];
+
+function useLocalState(key, def) {
+  const [val, setVal] = useState(() => { try { const s = localStorage.getItem(key); return s ? JSON.parse(s) : def; } catch { return def; } });
+  const save = v => { setVal(v); try { localStorage.setItem(key, JSON.stringify(v)); } catch {} };
+  return [val, save];
+}
+
 function Dashboard() {
-  const [alerts, setAlerts] = useState([
-    { id: 1, type: "critical", icon: "⚠️", text: "Torque spec issue – Zone B Row 28. Ahmed stopped work pending foreman review.", time: "09:47 · CRITICAL" },
-    { id: 2, type: "warn",     icon: "📦", text: "MC4 connector stock at 18%. Reorder 1,200 units before Monday.", time: "08:30 · MATERIALS" },
-    { id: 3, type: "info",     icon: "🌬️", text: "Wind advisory 3–5 PM. Pause crane lifts in Zone D.", time: "07:15 · WEATHER" },
-    { id: 4, type: "ok",       icon: "✅", text: "Zone A final inspection passed. Ready for interconnect sign-off.", time: "07:00 · COMPLETE" },
-  ]);
-  const [tasks, setTasks] = useState([
-    { id:1, done:true,  active:false, urgent:false, text:"Morning safety tailgate – all crew", time:"07:00", p:"high" },
-    { id:2, done:true,  active:false, urgent:false, text:"Zone A punch list – final torque & QC sign-off", time:"09:30", p:"high" },
-    { id:3, done:false, active:true,  urgent:false, text:"Zone B string testing – strings 1–12", time:"NOW", p:"high" },
-    { id:4, done:false, active:true,  urgent:false, text:"Zone C panel install – target 200 panels by EOD", time:"NOW", p:"med" },
-    { id:5, done:false, active:false, urgent:true,  text:"Resolve torque issue Zone B Row 28", time:"URGENT", p:"high" },
-    { id:6, done:false, active:false, urgent:false, text:"Reorder confirmation – MC4 connectors (1,200 units)", time:"14:00", p:"med" },
-    { id:7, done:false, active:false, urgent:false, text:"EOD photo documentation – all active zones", time:"17:00", p:"low" },
-    { id:8, done:false, active:false, urgent:false, text:"Submit daily production report to PM", time:"17:30", p:"low" },
-  ]);
+  const [alerts, setAlerts] = useLocalState("so_alerts", DEFAULT_ALERTS);
+  const [tasks,  setTasks]  = useLocalState("so_tasks",  DEFAULT_TASKS);
   const [newTask, setNewTask] = useState("");
   const [chatMsgs, setChatMsgs] = useState([
     { from:"ai",   text:"Good morning ☀️  Zone A is complete. Today: fix torque issue Zone B Row 28, push Zone C to 200 panels. You're 3 days ahead of schedule — great pace." },
@@ -454,8 +463,9 @@ function Dashboard() {
   };
   useEffect(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [chatMsgs]);
 
-  const toggleTask = id => setTasks(t => t.map(x => x.id === id ? { ...x, done: !x.done, active: false } : x));
-  const addTask = () => { if (!newTask.trim()) return; setTasks(t => [...t, { id: Date.now(), done:false, active:false, urgent:false, text: newTask, time:"—", p:"med" }]); setNewTask(""); };
+  const toggleTask = id => setTasks(tasks.map(x => x.id === id ? { ...x, done: !x.done, active: false } : x));
+  const addTask = () => { if (!newTask.trim()) return; setTasks([...tasks, { id: Date.now(), done:false, active:false, urgent:false, text: newTask, time:"—", p:"med" }]); setNewTask(""); };
+  const deleteTask = id => setTasks(tasks.filter(x => x.id !== id));
 
   const pDot = { high:"var(--red)", med:"var(--amber)", low:"var(--green)" };
 
@@ -482,7 +492,7 @@ function Dashboard() {
         {/* Alerts */}
         {alerts.length > 0 && (
           <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-            {alerts.map(a => <AlertBanner key={a.id} {...a} onDismiss={() => setAlerts(al => al.filter(x => x.id !== a.id))} />)}
+            {alerts.map(a => <AlertBanner key={a.id} {...a} onDismiss={() => setAlerts(alerts.filter(x => x.id !== a.id))} />)}
           </div>
         )}
 
@@ -548,15 +558,18 @@ function Dashboard() {
             </div>
           </div>
           {tasks.map((t,i) => (
-            <div key={t.id} onClick={()=>toggleTask(t.id)} style={{ display:"flex", alignItems:"center", gap:14, padding:"13px 22px", borderBottom: i<tasks.length-1?"1px solid rgba(255,255,255,.04)":"none", cursor:"pointer", transition:"background .15s" }}
+            <div key={t.id} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderBottom: i<tasks.length-1?"1px solid rgba(255,255,255,.04)":"none", cursor:"pointer", transition:"background .15s", minHeight:56 }}
               onMouseEnter={e=>e.currentTarget.style.background="rgba(0,210,255,.04)"}
               onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <div style={{ width:8, height:8, borderRadius:"50%", background:pDot[t.p], flexShrink:0 }} />
-              <div style={{ width:22, height:22, borderRadius:"50%", border:`2px solid ${t.done?"var(--green)":t.active?"var(--cyan)":"var(--text3)"}`, background:t.done?"var(--green)":"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:11, color:t.done?"#000":t.active?"var(--cyan)":"transparent", fontWeight:700, transition:"all .2s" }}>
-                {t.done?"✓":t.active?"▶":""}
+              <div onClick={()=>toggleTask(t.id)} style={{ display:"flex", alignItems:"center", gap:12, flex:1 }}>
+                <div style={{ width:8, height:8, borderRadius:"50%", background:pDot[t.p], flexShrink:0 }} />
+                <div style={{ width:26, height:26, borderRadius:"50%", border:`2px solid ${t.done?"var(--green)":t.active?"var(--cyan)":"var(--text3)"}`, background:t.done?"var(--green)":"transparent", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:12, color:t.done?"#000":t.active?"var(--cyan)":"transparent", fontWeight:700, transition:"all .2s" }}>
+                  {t.done?"✓":t.active?"▶":""}
+                </div>
+                <div style={{ flex:1, fontSize:14, textDecoration:t.done?"line-through":"none", color:t.done?"var(--text3)":t.urgent?"var(--red)":"var(--text)", lineHeight:1.4 }}>{t.text}</div>
+                <span className="mono" style={{ fontSize:10, color:t.urgent?"var(--red)":t.active?"var(--cyan)":"var(--text3)", letterSpacing:1, flexShrink:0 }}>{t.time}</span>
               </div>
-              <div style={{ flex:1, fontSize:13.5, textDecoration:t.done?"line-through":"none", color:t.done?"var(--text3)":t.urgent?"var(--red)":"var(--text)" }}>{t.text}</div>
-              <span className="mono" style={{ fontSize:10, color:t.urgent?"var(--red)":t.active?"var(--cyan)":"var(--text3)", letterSpacing:1 }}>{t.time}</span>
+              <button onClick={()=>deleteTask(t.id)} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:18, padding:"4px 6px", flexShrink:0, lineHeight:1 }}>×</button>
             </div>
           ))}
         </div>
@@ -753,10 +766,7 @@ function SiteMap() {
 /* ═══════════════════════════════════════════
    CREW
 ═══════════════════════════════════════════ */
-function Crew() {
-  const [filter, setFilter] = useState("All");
-  const [search, setSearch] = useState("");
-  const allCrew = [
+const DEFAULT_CREW = [
     { name:"Carlos Mendez",   role:"Lead Installer", zone:"Zone B", cert:"OSHA-30", certExp:"2026-01", status:"active", panels:48,  hours:6.2, phone:"555-0101", ppe:true  },
     { name:"DeShawn Harris",  role:"Electrician",    zone:"Zone B", cert:"NABCEP",  certExp:"2025-11", status:"active", panels:"—", hours:6.2, phone:"555-0102", ppe:true  },
     { name:"Maria Santos",    role:"Installer",      zone:"Zone C", cert:"OSHA-10", certExp:"2027-03", status:"active", panels:41,  hours:6.2, phone:"555-0103", ppe:true  },
@@ -767,11 +777,20 @@ function Crew() {
     { name:"Keisha Brown",    role:"Electrician",    zone:"Zone D", cert:"NABCEP",  certExp:"2027-02", status:"active", panels:"—", hours:6.2, phone:"555-0108", ppe:true  },
     { name:"Luis Vega",       role:"Installer",      zone:"Zone C", cert:"OSHA-10", certExp:"2026-07", status:"active", panels:44,  hours:6.2, phone:"555-0109", ppe:true  },
     { name:"Sarah Kim",       role:"QC Inspector",   zone:"Zone A", cert:"OSHA-30", certExp:"2027-01", status:"active", panels:"—", hours:6.2, phone:"555-0110", ppe:true  },
-  ];
+];
+
+function Crew() {
+  const [crew, setCrew] = useLocalState("so_crew", DEFAULT_CREW);
+  const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [showAdd, setShowAdd] = useState(false);
+  const [newWorker, setNewWorker] = useState({ name:"", role:"Installer", zone:"Zone B", cert:"OSHA-10", certExp:"2027-01", phone:"", status:"active", panels:0, hours:0, ppe:true });
   const statLabel = { active:"● ACTIVE", break:"⏸ BREAK", issue:"⚠ ISSUE", travel:"→ TRAVEL" };
   const statPill  = { active:"pill-green", break:"pill-amber", issue:"pill-red", travel:"pill-cyan" };
   const filters   = ["All","Active","Break","Issue","Travel"];
-  const visible   = allCrew.filter(w => (filter==="All" || w.status===filter.toLowerCase()) && (w.name.toLowerCase().includes(search.toLowerCase()) || w.role.toLowerCase().includes(search.toLowerCase())));
+  const visible   = crew.filter(w => (filter==="All" || w.status===filter.toLowerCase()) && (w.name.toLowerCase().includes(search.toLowerCase()) || w.role.toLowerCase().includes(search.toLowerCase())));
+  const addWorker = () => { if (!newWorker.name.trim()) return; setCrew([...crew, newWorker]); setNewWorker({ name:"", role:"Installer", zone:"Zone B", cert:"OSHA-10", certExp:"2027-01", phone:"", status:"active", panels:0, hours:0, ppe:true }); setShowAdd(false); };
+  const removeWorker = name => setCrew(crew.filter(w => w.name !== name));
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
@@ -791,12 +810,35 @@ function Crew() {
                 <button key={f} onClick={()=>setFilter(f)} style={{ background:filter===f?"rgba(0,210,255,.15)":"rgba(255,255,255,.04)", border:`1px solid ${filter===f?"rgba(0,210,255,.4)":"var(--border)"}`, color:filter===f?"var(--cyan)":"var(--text2)", fontSize:11, fontWeight:600, padding:"5px 12px", borderRadius:7, transition:"all .2s" }}>{f}</button>
               ))}
             </div>
-            <button className="btn-primary">+ Add Worker</button>
+            <button className="btn-primary" onClick={()=>setShowAdd(a=>!a)}>+ Add Worker</button>
           </div>
         </div>
+        {showAdd && (
+          <div style={{ padding:"16px", background:"rgba(0,210,255,.05)", borderBottom:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:10 }}>
+            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:15, fontWeight:700, color:"var(--cyan)" }}>Add New Worker</div>
+            <div className="incident-grid">
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>FULL NAME</div><input value={newWorker.name} onChange={e=>setNewWorker(x=>({...x,name:e.target.value}))} placeholder="Full name" /></div>
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>ROLE</div>
+                <select value={newWorker.role} onChange={e=>setNewWorker(x=>({...x,role:e.target.value}))}>
+                  {["Installer","Lead Installer","Electrician","Foreman","QC Inspector"].map(r=><option key={r}>{r}</option>)}
+                </select>
+              </div>
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>ZONE</div>
+                <select value={newWorker.zone} onChange={e=>setNewWorker(x=>({...x,zone:e.target.value}))}>
+                  {["Zone A","Zone B","Zone C","Zone D","Yard"].map(z=><option key={z}>{z}</option>)}
+                </select>
+              </div>
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>PHONE</div><input value={newWorker.phone} onChange={e=>setNewWorker(x=>({...x,phone:e.target.value}))} placeholder="555-0100" /></div>
+            </div>
+            <div style={{ display:"flex", gap:8 }}>
+              <button className="btn-primary" onClick={addWorker}>✓ Add to Crew</button>
+              <button className="btn-ghost" onClick={()=>setShowAdd(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
         <table>
           <thead><tr>
-            <th>Worker</th><th>Role</th><th>Zone</th><th>Certification</th><th>Cert Expiry</th><th>PPE</th><th>Status</th><th>Panels</th><th>Hours</th><th>Contact</th>
+            <th>Worker</th><th>Role</th><th>Zone</th><th>Cert</th><th>PPE</th><th>Status</th><th>Panels</th><th>Hours</th><th>Contact</th><th></th>
           </tr></thead>
           <tbody>
             {visible.map((w,i)=>(
@@ -805,12 +847,12 @@ function Crew() {
                 <td><span style={{ fontSize:12, color:"var(--text2)" }}>{w.role}</span></td>
                 <td><span className="mono" style={{ fontSize:12 }}>{w.zone}</span></td>
                 <td><span className="pill pill-cyan" style={{ fontSize:10 }}>{w.cert}</span></td>
-                <td><span className="mono" style={{ fontSize:11, color: new Date(w.certExp) < new Date("2026-01-01") ? "var(--amber)" : "var(--text3)" }}>{w.certExp}</span></td>
                 <td><span style={{ color:w.ppe?"var(--green)":"var(--red)", fontSize:16 }}>{w.ppe?"✓":"✗"}</span></td>
                 <td><span className={`pill ${statPill[w.status]}`}>{statLabel[w.status]}</span></td>
                 <td><span className="mono" style={{ color:"var(--green)", fontSize:14 }}>{w.panels}</span></td>
                 <td><span className="mono" style={{ fontSize:12 }}>{w.hours}h</span></td>
                 <td><span className="mono" style={{ fontSize:11, color:"var(--cyan)" }}>{w.phone}</span></td>
+                <td><button onClick={()=>removeWorker(w.name)} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:16, padding:"4px 8px", cursor:"pointer" }}>×</button></td>
               </tr>
             ))}
           </tbody>
@@ -824,24 +866,27 @@ function Crew() {
 /* ═══════════════════════════════════════════
    MATERIALS
 ═══════════════════════════════════════════ */
+const DEFAULT_MATERIALS = [
+  { name:"Solar Panels (400W)",  sku:"SP-400W",  stock:3579, unit:"panels", min:500,  reorder:500  },
+  { name:"MC4 Connectors",       sku:"MC4-M/F",  stock:214,  unit:"pairs",  min:500,  reorder:1200 },
+  { name:"Racking Rails (4m)",   sku:"RR-4M",    stock:890,  unit:"pcs",    min:200,  reorder:200  },
+  { name:"Mounting Bolts M8",    sku:"MB-M8",    stock:4200, unit:"units",  min:1000, reorder:1000 },
+  { name:"PV Wire 10AWG",        sku:"PVW-10",   stock:1100, unit:"ft",     min:2000, reorder:2000 },
+  { name:'Conduit 3/4" EMT',     sku:"EMT-34",   stock:650,  unit:"ft",     min:500,  reorder:500  },
+  { name:"Junction Boxes IP65",  sku:"JB-IP65",  stock:38,   unit:"units",  min:10,   reorder:10   },
+  { name:"Grounding Clips SS",   sku:"GC-SS",    stock:820,  unit:"units",  min:200,  reorder:200  },
+];
+
 function Materials() {
-  const [items, setItems] = useState([
-    { name:"Solar Panels (400W)",  sku:"SP-400W",  stock:3579, unit:"panels", min:500,  status:"ok",       reorder:500  },
-    { name:"MC4 Connectors",       sku:"MC4-M/F",  stock:214,  unit:"pairs",  min:500,  status:"critical", reorder:1200 },
-    { name:"Racking Rails (4m)",   sku:"RR-4M",    stock:890,  unit:"pcs",    min:200,  status:"ok",       reorder:200  },
-    { name:"Mounting Bolts M8",    sku:"MB-M8",    stock:4200, unit:"units",  min:1000, status:"ok",       reorder:1000 },
-    { name:"PV Wire 10AWG",        sku:"PVW-10",   stock:1100, unit:"ft",     min:2000, status:"warn",     reorder:2000 },
-    { name:'Conduit 3/4" EMT',     sku:"EMT-34",   stock:650,  unit:"ft",     min:500,  status:"warn",     reorder:500  },
-    { name:"Junction Boxes IP65",  sku:"JB-IP65",  stock:38,   unit:"units",  min:10,   status:"ok",       reorder:10   },
-    { name:"Grounding Clips SS",   sku:"GC-SS",    stock:820,  unit:"units",  min:200,  status:"ok",       reorder:200  },
-  ]);
+  const [items, setItems] = useLocalState("so_materials", DEFAULT_MATERIALS);
   const [receiving, setReceiving] = useState({ show:false, item:"", qty:"" });
+  const getStatus = item => item.stock < item.min * 0.5 ? "critical" : item.stock < item.min ? "warn" : "ok";
   const sc = { ok:"var(--green)", warn:"var(--amber)", critical:"var(--red)" };
   const sp = { ok:"pill-green",   warn:"pill-amber",   critical:"pill-red"   };
 
   const receive = () => {
     if (!receiving.item || !receiving.qty) return;
-    setItems(it => it.map(x => x.sku===receiving.item ? { ...x, stock: x.stock + parseInt(receiving.qty||0) } : x));
+    setItems(items.map(x => x.sku===receiving.item ? { ...x, stock: x.stock + parseInt(receiving.qty||0) } : x));
     setReceiving({ show:false, item:"", qty:"" });
   };
 
@@ -884,14 +929,14 @@ function Materials() {
               <tr key={i}>
                 <td style={{ fontWeight:600, fontSize:13.5 }}>{item.name}</td>
                 <td><span className="mono" style={{ fontSize:12 }}>{item.sku}</span></td>
-                <td><span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700, color:sc[item.status] }}>{item.stock.toLocaleString()}</span></td>
+                <td><span style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700, color:sc[getStatus(item)] }}>{item.stock.toLocaleString()}</span></td>
                 <td><span className="mono" style={{ fontSize:11, color:"var(--text3)" }}>{item.unit}</span></td>
                 <td><span className="mono" style={{ fontSize:12 }}>{item.min.toLocaleString()}</span></td>
-                <td><span className={`pill ${sp[item.status]}`}>{item.status.toUpperCase()}</span></td>
+                <td><span className={`pill ${sp[getStatus(item)]}`}>{getStatus(item).toUpperCase()}</span></td>
                 <td>
                   <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <span className="mono" style={{ color:"var(--cyan)", fontSize:13 }}>{item.reorder.toLocaleString()}</span>
-                    {item.status!=="ok" && <button className="btn-ghost" style={{ fontSize:11, padding:"4px 10px" }}>Order Now</button>}
+                    {getStatus(item)!=="ok" && <button className="btn-ghost" style={{ fontSize:11, padding:"4px 10px" }}>Order Now</button>}
                   </div>
                 </td>
               </tr>
@@ -952,9 +997,19 @@ function Reports() {
 /* ═══════════════════════════════════════════
    SAFETY
 ═══════════════════════════════════════════ */
+const DEFAULT_INCIDENTS = [];
+
 function Safety() {
+  const [incidents, setIncidents] = useLocalState("so_incidents", DEFAULT_INCIDENTS);
   const [showLog, setShowLog] = useState(false);
   const [incident, setIncident] = useState({ type:"", desc:"", worker:"", zone:"" });
+  const submitIncident = () => {
+    if (!incident.type) return;
+    const now = new Date();
+    setIncidents([{ ...incident, id:Date.now(), time:`${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")} · TODAY` }, ...incidents]);
+    setIncident({ type:"", desc:"", worker:"", zone:"" });
+    setShowLog(false);
+  };
   const crew = [
     { name:"Carlos Mendez",   osha:"OSHA-30", exp:"2026-01", ppe:true,  tailgate:true,  status:"ok"       },
     { name:"DeShawn Harris",  osha:"NABCEP",  exp:"2025-11", ppe:true,  tailgate:true,  status:"warn"     },
@@ -1014,7 +1069,7 @@ function Safety() {
               <textarea value={incident.desc} onChange={e=>setIncident(x=>({...x,desc:e.target.value}))} placeholder="Describe what happened…" rows={3} style={{ resize:"vertical" }} />
             </div>
             <div style={{ display:"flex", gap:8 }}>
-              <button className="btn-danger">Submit Incident Report</button>
+              <button className="btn-danger" onClick={submitIncident}>✓ Submit Incident Report</button>
               <button className="btn-ghost" onClick={()=>setShowLog(false)}>Cancel</button>
             </div>
           </div>
@@ -1036,6 +1091,30 @@ function Safety() {
           </tbody>
         </table>
       </div>
+
+      {incidents.length > 0 && (
+        <div className="card fade-up">
+          <div className="card-header">
+            <SectionTitle sub="All logged incidents & near-misses">Incident Log</SectionTitle>
+            <button className="btn-ghost" onClick={()=>setIncidents([])}>Clear All</button>
+          </div>
+          {incidents.map((inc,i)=>(
+            <div key={inc.id} style={{ padding:"14px 18px", borderBottom:i<incidents.length-1?"1px solid rgba(255,255,255,.04)":"none", display:"flex", gap:12, alignItems:"flex-start" }}>
+              <span style={{ fontSize:20, flexShrink:0 }}>🚨</span>
+              <div style={{ flex:1 }}>
+                <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:4, flexWrap:"wrap" }}>
+                  <span className="pill pill-red" style={{ fontSize:10 }}>{inc.type}</span>
+                  {inc.worker && <span style={{ fontSize:12, color:"var(--text2)" }}>{inc.worker}</span>}
+                  {inc.zone && <span className="mono" style={{ fontSize:11, color:"var(--text3)" }}>{inc.zone}</span>}
+                </div>
+                {inc.desc && <div style={{ fontSize:12, color:"var(--text3)", lineHeight:1.4 }}>{inc.desc}</div>}
+                <div className="mono" style={{ fontSize:10, color:"var(--red)", marginTop:4 }}>{inc.time}</div>
+              </div>
+              <button onClick={()=>setIncidents(incidents.filter(x=>x.id!==inc.id))} style={{ background:"none", border:"none", color:"var(--text3)", fontSize:16, padding:"4px", cursor:"pointer" }}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -1043,30 +1122,66 @@ function Safety() {
 /* ═══════════════════════════════════════════
    STRING TESTING
 ═══════════════════════════════════════════ */
+const DEFAULT_STRINGS = [
+  { id:"ZB-S01", zone:"Zone B", eff:99.1, voc:401.2, isc:10.22, status:"pass", tech:"DeShawn Harris", date:"Today 08:12" },
+  { id:"ZB-S02", zone:"Zone B", eff:98.7, voc:399.8, isc:10.18, status:"pass", tech:"DeShawn Harris", date:"Today 08:45" },
+  { id:"ZB-S03", zone:"Zone B", eff:97.4, voc:397.1, isc:10.05, status:"pass", tech:"DeShawn Harris", date:"Today 09:10" },
+  { id:"ZB-S04", zone:"Zone B", eff:94.2, voc:388.3, isc:9.81,  status:"warn", tech:"DeShawn Harris", date:"Today 09:40" },
+  { id:"ZB-S05", zone:"Zone B", eff:98.9, voc:400.5, isc:10.20, status:"pass", tech:"DeShawn Harris", date:"Today 10:05" },
+  { id:"ZA-S01", zone:"Zone A", eff:99.3, voc:402.1, isc:10.28, status:"pass", tech:"Keisha Brown",   date:"Mar 6 14:20" },
+  { id:"ZA-S02", zone:"Zone A", eff:98.1, voc:398.2, isc:10.12, status:"pass", tech:"Keisha Brown",   date:"Mar 6 15:00" },
+  { id:"ZA-S03", zone:"Zone A", eff:82.3, voc:371.4, isc:9.41,  status:"fail", tech:"Keisha Brown",   date:"Mar 6 15:40" },
+];
+
 function StringTesting() {
-  const strings = [
-    { id:"ZB-S01", zone:"Zone B", eff:99.1, voc:401.2, isc:10.22, status:"pass", tech:"DeShawn Harris", date:"Today 08:12" },
-    { id:"ZB-S02", zone:"Zone B", eff:98.7, voc:399.8, isc:10.18, status:"pass", tech:"DeShawn Harris", date:"Today 08:45" },
-    { id:"ZB-S03", zone:"Zone B", eff:97.4, voc:397.1, isc:10.05, status:"pass", tech:"DeShawn Harris", date:"Today 09:10" },
-    { id:"ZB-S04", zone:"Zone B", eff:94.2, voc:388.3, isc:9.81,  status:"warn", tech:"DeShawn Harris", date:"Today 09:40" },
-    { id:"ZB-S05", zone:"Zone B", eff:98.9, voc:400.5, isc:10.20, status:"pass", tech:"DeShawn Harris", date:"Today 10:05" },
-    { id:"ZA-S01", zone:"Zone A", eff:99.3, voc:402.1, isc:10.28, status:"pass", tech:"Keisha Brown",   date:"Mar 6 14:20" },
-    { id:"ZA-S02", zone:"Zone A", eff:98.1, voc:398.2, isc:10.12, status:"pass", tech:"Keisha Brown",   date:"Mar 6 15:00" },
-    { id:"ZA-S03", zone:"Zone A", eff:82.3, voc:371.4, isc:9.41,  status:"fail", tech:"Keisha Brown",   date:"Mar 6 15:40" },
-  ];
+  const [strings, setStrings] = useLocalState("so_strings", DEFAULT_STRINGS);
+  const [showForm, setShowForm] = useState(false);
+  const [newTest, setNewTest] = useState({ id:"", zone:"Zone B", eff:"", voc:"", isc:"", tech:"" });
+  const logTest = () => {
+    if (!newTest.id || !newTest.eff) return;
+    const eff = parseFloat(newTest.eff);
+    const status = eff >= 97 ? "pass" : eff >= 90 ? "warn" : "fail";
+    const now = new Date();
+    const timeStr = `Today ${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}`;
+    setStrings([{ ...newTest, eff, voc:parseFloat(newTest.voc)||0, isc:parseFloat(newTest.isc)||0, status, date:timeStr }, ...strings]);
+    setNewTest({ id:"", zone:"Zone B", eff:"", voc:"", isc:"", tech:"" });
+    setShowForm(false);
+  };
+  const passCount = strings.filter(s=>s.status==="pass").length;
+  const avgEff = (strings.reduce((a,s)=>a+s.eff,0)/strings.length).toFixed(1);
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
       <div className="kpi-grid">
-        <KpiCard label="Strings Tested" value="8"   sub="of 48 total"      color="var(--cyan)"  icon="🔌" />
-        <KpiCard label="Pass Rate"      value="87%" sub="7 pass · 1 fail"  color="var(--green)" icon="✅" />
-        <KpiCard label="Avg Efficiency" value="96.8%" sub="Target: ≥95%"   color="var(--sun)"   icon="⚡" />
-        <KpiCard label="Flagged"        value="2"   sub="1 warn · 1 fail"  color="var(--amber)" icon="⚠️" />
+        <KpiCard label="Strings Tested" value={strings.length} sub={`of 48 total`} color="var(--cyan)" icon="🔌" />
+        <KpiCard label="Pass Rate" value={`${Math.round(passCount/strings.length*100)}%`} sub={`${passCount} pass · ${strings.length-passCount} fail`} color="var(--green)" icon="✅" />
+        <KpiCard label="Avg Efficiency" value={`${avgEff}%`} sub="Target: ≥95%" color="var(--sun)" icon="⚡" />
+        <KpiCard label="Flagged" value={strings.filter(s=>s.status!=="pass").length} sub="warn + fail" color="var(--amber)" icon="⚠️" />
       </div>
       <div className="card fade-up">
         <div className="card-header">
           <SectionTitle sub="All string test results">String Test Log</SectionTitle>
-          <button className="btn-primary">+ Log New Test</button>
+          <button className="btn-primary" onClick={()=>setShowForm(f=>!f)}>+ Log New Test</button>
         </div>
+        {showForm && (
+          <div style={{ padding:"16px 16px", background:"rgba(0,210,255,.05)", borderBottom:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:10 }}>
+            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:15, fontWeight:700, color:"var(--cyan)" }}>Log New String Test</div>
+            <div className="incident-grid">
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>STRING ID</div><input value={newTest.id} onChange={e=>setNewTest(x=>({...x,id:e.target.value}))} placeholder="e.g. ZB-S06" /></div>
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>ZONE</div>
+                <select value={newTest.zone} onChange={e=>setNewTest(x=>({...x,zone:e.target.value}))}>
+                  {["Zone A","Zone B","Zone C","Zone D"].map(z=><option key={z}>{z}</option>)}
+                </select>
+              </div>
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>EFFICIENCY %</div><input value={newTest.eff} onChange={e=>setNewTest(x=>({...x,eff:e.target.value}))} placeholder="e.g. 98.5" /></div>
+              <div><div style={{ fontSize:11, color:"var(--text3)", marginBottom:4 }}>TECHNICIAN</div><input value={newTest.tech} onChange={e=>setNewTest(x=>({...x,tech:e.target.value}))} placeholder="Name" /></div>
+            </div>
+            <div style={{ display:"flex", gap:8 }}>
+              <button className="btn-primary" onClick={logTest}>✓ Submit Test</button>
+              <button className="btn-ghost" onClick={()=>setShowForm(false)}>Cancel</button>
+            </div>
+          </div>
+        )}
         <table>
           <thead><tr><th>String ID</th><th>Zone</th><th>Efficiency</th><th>Voc (V)</th><th>Isc (A)</th><th>Result</th><th>Technician</th><th>Tested</th></tr></thead>
           <tbody>

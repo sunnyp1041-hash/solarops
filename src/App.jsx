@@ -261,6 +261,19 @@ input::placeholder { color: var(--text3); }
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 /* Reports grid */
 .reports-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+/* Schedule grid */
+.schedule-grid { display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+/* Zone cards grid */
+.zone-cards-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+/* Incident form grid */
+.incident-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+/* Quick actions grid */
+.quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* Week stats */
+.week-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+/* Make all tables scroll horizontally on small screens */
+.card { overflow-x: auto; }
 
 @media (max-width: 768px) {
   body { overflow: auto; }
@@ -280,6 +293,21 @@ input::placeholder { color: var(--text3); }
   .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
   /* Reports grid: 1 column on mobile */
   .reports-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+  /* Schedule: stack vertically */
+  .schedule-grid { grid-template-columns: 1fr !important; }
+  /* Zone cards: 2 per row */
+  .zone-cards-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  /* Incident form: 1 col */
+  .incident-grid { grid-template-columns: 1fr !important; }
+  /* Quick actions: 2 col stays fine */
+  .quick-actions-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* Tables: scroll horizontally */
+  table { display: block; overflow-x: auto; white-space: nowrap; width: 100%; }
+
+  /* Card headers: stack on mobile */
+  .card-header { flex-wrap: wrap; gap: 10px !important; }
+  .card-header > div, .card-header > button { flex-shrink: 0; }
 
   .mobile-topbar { display: flex !important; }
   .bottom-nav { display: block !important; }
@@ -549,7 +577,7 @@ function Dashboard() {
                 </div>
               ))}
             </div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10, marginTop:14 }}>
+            <div className="week-stats-grid" style={{ marginTop:14 }}>
               {[["312","PANELS","var(--sun)"],["86%","EFFICIENCY","var(--cyan)"],["3d","AHEAD","var(--green)"]].map(([v,l,c])=>(
                 <div key={l} style={{ background:"rgba(0,0,0,.25)", border:"1px solid var(--border)", borderRadius:10, padding:"10px 8px", textAlign:"center" }}>
                   <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700, color:c }}>{v}</div>
@@ -585,7 +613,7 @@ function Dashboard() {
         <div className="card">
           <div style={{ padding:"18px 20px 14px" }}>
             <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:14, fontWeight:600, color:"var(--text3)", letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>⚡ Quick Actions</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+            <div className="quick-actions-grid">
               {[["📋","Log Panels","var(--cyan)"],["📸","Add Photo","var(--purple)"],["⚠️","Flag Issue","var(--red)"],["🔌","String Test","var(--green)"],["⏱️","Time Entry","var(--amber)"],["📊","Generate Report","var(--sun)"]].map(([icon,label,col])=>(
                 <button key={label} style={{ background:"rgba(255,255,255,.04)", border:"1px solid var(--border)", borderRadius:10, padding:"12px 10px", textAlign:"center", color:"var(--text2)", transition:"all .2s" }}
                   onMouseEnter={e=>{ e.currentTarget.style.borderColor=col; e.currentTarget.style.color=col; e.currentTarget.style.background=`${col}18`; }}
@@ -658,7 +686,7 @@ function SiteMap() {
         </div>
         <div style={{ padding:24, display:"flex", flexDirection:"column", gap:16 }}>
           {/* Zone cards */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:14 }}>
+          <div className="zone-cards-grid">
             {zones.map(z=>(
               <div key={z.id} onClick={()=>setSelected(s=>s===z.id?null:z.id)}
                 style={{ background:selected===z.id?"rgba(0,210,255,.08)":"rgba(0,0,0,.25)", border:`2px solid ${selected===z.id?z.color:"var(--border)"}`, borderRadius:14, padding:20, cursor:"pointer", transition:"all .2s", textAlign:"center" }}
@@ -964,7 +992,7 @@ function Safety() {
         {showLog && (
           <div style={{ padding:"18px 22px", background:"rgba(255,71,87,.05)", borderBottom:"1px solid rgba(255,71,87,.2)" }}>
             <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:16, fontWeight:700, color:"var(--red)", marginBottom:14 }}>Log New Incident / Near-Miss</div>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr 1fr", gap:12, marginBottom:12 }}>
+            <div className="incident-grid">
               <div>
                 <div style={{ fontSize:11, color:"var(--text3)", marginBottom:5 }}>TYPE</div>
                 <select value={incident.type} onChange={e=>setIncident(x=>({...x,type:e.target.value}))}>
@@ -1096,7 +1124,7 @@ function Schedule() {
         <KpiCard label="Est. Complete" value="Mar 25" sub="3 days early"    trend="Original: Mar 28" color="var(--sun)" icon="🏁" />
         <KpiCard label="Weeks Left"    value="3"    sub="to panel complete" color="var(--amber)" icon="⏳" />
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:20 }}>
+      <div className="schedule-grid">
         {/* Weekly table */}
         <div className="card fade-up">
           <div className="card-header"><SectionTitle sub="Planned vs actual production">Weekly Schedule</SectionTitle></div>

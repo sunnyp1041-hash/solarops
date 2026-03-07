@@ -245,9 +245,17 @@ input::placeholder { color: var(--text3); }
 }
 
 /* ── RESPONSIVE BREAKPOINTS ── */
+.desktop-topbar { display: flex; }
+.desktop-sidebar { display: flex; }
+.desktop-page-header { display: flex; }
+.desktop-content { display: block; }
+.desktop-layout { display: flex; }
+.mobile-content { display: none; }
+
 @media (max-width: 768px) {
   body { overflow: auto; }
 
+  .desktop-layout { display: none !important; }
   .desktop-topbar { display: none !important; }
   .desktop-sidebar { display: none !important; }
   .desktop-page-header { display: none !important; }
@@ -2004,7 +2012,7 @@ export default function App() {
           </div>
         </div>
 
-        <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
+        <div className="desktop-layout" style={{ flex:1, overflow:"hidden" }}>
           <div className="desktop-sidebar" style={{ width:210, background:"var(--bg2)", borderRight:"1px solid var(--border)", flexDirection:"column", padding:"14px 10px", flexShrink:0, overflowY:"auto" }}>
             <div className="section-label" style={{ paddingTop:6 }}>Navigation</div>
             {NAV.map(n=>(
@@ -2043,7 +2051,7 @@ export default function App() {
             <div style={{ flex:1, padding:24, paddingTop:20, overflow:"hidden" }} className="desktop-content">
               {views[tab]}
             </div>
-            <div className="mobile-content" style={{ display:"none", padding:"16px 16px 80px", overflowY:"auto", flex:1 }}>
+            <div className="mobile-content" style={{ padding:"16px 16px 80px", overflowY:"auto", flex:1 }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700 }}>
                   {currentNav?.icon} {currentNav?.label}

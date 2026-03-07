@@ -2051,16 +2051,17 @@ export default function App() {
             <div style={{ flex:1, padding:24, paddingTop:20, overflow:"hidden" }} className="desktop-content">
               {views[tab]}
             </div>
-            <div className="mobile-content" style={{ padding:"16px 16px 80px", overflowY:"auto", flex:1 }}>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
-                <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700 }}>
-                  {currentNav?.icon} {currentNav?.label}
-                </div>
-                <button style={{ background:"rgba(255,71,87,.12)", border:"1px solid rgba(255,71,87,.25)", color:"var(--red)", borderRadius:8, padding:"6px 12px", fontSize:12, fontWeight:700, cursor:"pointer" }}>🚨 SOS</button>
-              </div>
-              {views[tab]}
-            </div>
           </div>
+        </div>
+
+        <div className="mobile-content" style={{ padding:"16px 16px 80px", overflowY:"auto", flex:1 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700 }}>
+              {currentNav?.icon} {currentNav?.label}
+            </div>
+            <button style={{ background:"rgba(255,71,87,.12)", border:"1px solid rgba(255,71,87,.25)", color:"var(--red)", borderRadius:8, padding:"6px 12px", fontSize:12, fontWeight:700, cursor:"pointer" }}>🚨 SOS</button>
+          </div>
+          {views[tab]}
         </div>
 
         <nav className="bottom-nav">

@@ -802,7 +802,7 @@ function Crew() {
       </div>
       <div className="card fade-up">
         <div className="card-header">
-          <SectionTitle sub={`Showing ${visible.length} of ${allCrew.length}`}>All Crew Members</SectionTitle>
+          <SectionTitle sub={`Showing ${visible.length} of ${crew.length}`}>All Crew Members</SectionTitle>
           <div style={{ display:"flex", gap:10, alignItems:"center" }}>
             <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search name or role…" style={{ width:200, padding:"7px 12px", fontSize:12 }} />
             <div style={{ display:"flex", gap:6 }}>

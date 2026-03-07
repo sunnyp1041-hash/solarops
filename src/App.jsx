@@ -2043,7 +2043,7 @@ export default function App() {
             <div style={{ flex:1, padding:24, paddingTop:20, overflow:"hidden" }} className="desktop-content">
               {views[tab]}
             </div>
-            <div className="mobile-content" style={{ display:"none" }}>
+            <div className="mobile-content" style={{ display:"none", padding:"16px 16px 80px", overflowY:"auto", flex:1 }}>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700 }}>
                   {currentNav?.icon} {currentNav?.label}

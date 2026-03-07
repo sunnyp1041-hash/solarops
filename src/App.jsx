@@ -259,6 +259,8 @@ input::placeholder { color: var(--text3); }
 
 /* KPI grid */
 .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+/* Reports grid */
+.reports-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 
 @media (max-width: 768px) {
   body { overflow: auto; }
@@ -276,6 +278,8 @@ input::placeholder { color: var(--text3); }
 
   /* KPI grid: 2 columns on mobile */
   .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+  /* Reports grid: 1 column on mobile */
+  .reports-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
 
   .mobile-topbar { display: flex !important; }
   .bottom-nav { display: block !important; }
@@ -892,7 +896,7 @@ function Reports() {
         <SectionTitle sub="All project documentation & auto-generated reports">Reports & Documentation</SectionTitle>
         <button className="btn-primary">📊 Generate Custom Report</button>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
+      <div className="reports-grid">
         {reports.map((r,i)=>(
           <div key={i} className="card fade-up" style={{ padding:22, cursor:"pointer", transition:"all .2s" }}
             onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(0,210,255,.35)"; e.currentTarget.style.transform="translateY(-2px)"; }}

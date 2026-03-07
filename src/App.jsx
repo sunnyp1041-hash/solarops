@@ -172,6 +172,131 @@ input::placeholder { color: var(--text3); }
   font-size: 11px; font-weight: 600;
   font-family: 'Share Tech Mono', monospace;
 }
+
+/* ── MOBILE BOTTOM NAV ── */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 64px;
+  background: rgba(7,13,26,.97);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  z-index: 200;
+  padding: 0 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.bottom-nav::-webkit-scrollbar { display: none; }
+.bottom-nav-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  gap: 2px;
+  min-width: max-content;
+  padding: 0 4px;
+}
+.bottom-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text3);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  cursor: pointer;
+  transition: all .2s;
+  min-width: 60px;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+}
+.bottom-nav-btn .bnav-icon { font-size: 20px; line-height: 1; }
+.bottom-nav-btn.active { color: var(--cyan); background: rgba(0,210,255,.08); border-color: rgba(0,210,255,.2); }
+.bottom-nav-btn .bnav-badge {
+  position: absolute; top: 4px; right: 8px;
+  background: var(--red); color: #fff;
+  font-size: 9px; font-weight: 700;
+  padding: 1px 4px; border-radius: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  line-height: 1.4;
+}
+.bottom-nav-btn .bnav-badge.amber { background: var(--amber); color: #000; }
+
+/* ── MOBILE TOPBAR ── */
+.mobile-topbar {
+  display: none;
+  height: 52px;
+  background: rgba(7,13,26,.97);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ── RESPONSIVE BREAKPOINTS ── */
+@media (max-width: 768px) {
+  body { overflow: auto; }
+
+  .desktop-topbar { display: none !important; }
+  .desktop-sidebar { display: none !important; }
+  .desktop-page-header { display: none !important; }
+  .desktop-content { display: none !important; }
+
+  .mobile-topbar { display: flex !important; }
+  .bottom-nav { display: block !important; }
+  .mobile-content { display: block !important; }
+
+  .kpi-grid-4 { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+  .kpi-grid-3 { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+
+  .dash-layout { grid-template-columns: 1fr !important; }
+  .zone-grid-5 { grid-template-columns: repeat(2,1fr) !important; }
+  .report-grid { grid-template-columns: 1fr !important; }
+  .schedule-grid { grid-template-columns: 1fr !important; }
+
+  .card-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px !important;
+  }
+  .card-header-actions { flex-wrap: wrap; gap: 6px; }
+
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  th, td { padding: 10px 14px !important; font-size: 12px !important; }
+
+  .hide-mobile { display: none !important; }
+  .mobile-full { width: 100% !important; }
+
+  input[type=text], input[type=search], select {
+    font-size: 16px !important;
+  }
+
+  .btn-primary, .btn-ghost, .btn-danger {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  .kpi-value-big { font-size: 28px !important; }
+  .section-title-text { font-size: 17px !important; }
+
+  .progress-row { padding: 12px 16px !important; }
+  .task-row { padding: 11px 16px !important; }
+  .alert-banner { padding: 10px 12px !important; }
+
+  .chat-panel { max-height: 260px !important; }
+  .right-panel-mobile { display: flex; flex-direction: column; gap: 14px; }
+}
 `;
 
 /* ═══════════════════════════════════════════
@@ -1011,15 +1136,15 @@ export default function App() {
   const hh = time.getHours().toString().padStart(2,"0");
   const mm = time.getMinutes().toString().padStart(2,"0");
   const ss = time.getSeconds().toString().padStart(2,"0");
+  const currentNav = NAV.find(n=>n.id===tab);
 
   return (
     <>
       <style>{G}</style>
-      <div style={{ display:"flex", flexDirection:"column", height:"100vh", background:"var(--bg)", overflow:"hidden" }}>
+      <div style={{ display:"flex", flexDirection:"column", height:"100vh", background:"var(--bg)" }}>
 
-        {/* TOP BAR */}
-        <div style={{ height:56, background:"rgba(7,13,26,.97)", borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px", flexShrink:0, backdropFilter:"blur(20px)" }}>
-          {/* Logo */}
+        {/* ── DESKTOP TOPBAR ── */}
+        <div className="desktop-topbar" style={{ height:56, background:"rgba(7,13,26,.97)", borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px", flexShrink:0, backdropFilter:"blur(20px)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <div style={{ width:34, height:34, background:"linear-gradient(135deg,var(--sun),#c97a00)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, animation:"glow 3s ease-in-out infinite", flexShrink:0 }}>☀️</div>
             <div>
@@ -1029,12 +1154,10 @@ export default function App() {
               <div className="mono" style={{ fontSize:9, color:"var(--text3)", letterSpacing:2 }}>FIELD COMMAND PLATFORM</div>
             </div>
           </div>
-
-          {/* Center info */}
           <div style={{ display:"flex", alignItems:"center", gap:24 }}>
             <div style={{ textAlign:"center" }}>
               <div className="mono" style={{ fontSize:9, color:"var(--text3)", letterSpacing:2, marginBottom:2 }}>PROJECT</div>
-              <div style={{ fontSize:13, fontWeight:600, color:"var(--text)" }}>Sunrise Solar Farm — Phase 2</div>
+              <div style={{ fontSize:13, fontWeight:600 }}>Sunrise Solar Farm — Phase 2</div>
             </div>
             <div style={{ width:1, height:30, background:"var(--border)" }} />
             <div style={{ textAlign:"center" }}>
@@ -1043,31 +1166,48 @@ export default function App() {
             </div>
             <div style={{ width:1, height:30, background:"var(--border)" }} />
             <div style={{ textAlign:"center" }}>
-              <div className="mono" style={{ fontSize:9, color:"var(--text3)", letterSpacing:2, marginBottom:2 }}>LOCAL TIME</div>
+              <div className="mono" style={{ fontSize:9, color:"var(--text3)", letterSpacing:2, marginBottom:2 }}>TIME</div>
               <div className="mono" style={{ fontSize:14, color:"var(--cyan)", fontWeight:700 }}>{hh}:{mm}:{ss}</div>
             </div>
           </div>
-
-          {/* Right */}
           <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:12, color:"var(--green)" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
               <div style={{ width:7, height:7, borderRadius:"50%", background:"var(--green)", animation:"blink 2s infinite" }} />
-              <span className="mono" style={{ fontSize:10, letterSpacing:1 }}>LIVE</span>
+              <span className="mono" style={{ fontSize:10, color:"var(--green)", letterSpacing:1 }}>LIVE</span>
             </div>
-            <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+            <div style={{ display:"flex", gap:8, alignItems:"center" }}>
               <div style={{ textAlign:"right" }}>
                 <div style={{ fontSize:13, fontWeight:600 }}>J. Martinez</div>
                 <div style={{ fontSize:10, color:"var(--text3)" }}>Site Foreman</div>
               </div>
-              <div style={{ width:36, height:36, background:"linear-gradient(135deg,var(--cyan),#0050aa)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:14, color:"#fff", flexShrink:0 }}>JM</div>
+              <div style={{ width:36, height:36, background:"linear-gradient(135deg,var(--cyan),#0050aa)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:14, color:"#fff" }}>JM</div>
             </div>
           </div>
         </div>
 
-        {/* BODY */}
+        {/* ── MOBILE TOPBAR ── */}
+        <div className="mobile-topbar">
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ width:30, height:30, background:"linear-gradient(135deg,var(--sun),#c97a00)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>☀️</div>
+            <div style={{ fontFamily:"'Rajdhani',sans-serif", fontWeight:700, fontSize:18 }}>
+              <span style={{ color:"var(--sun)" }}>Solar</span><span style={{ color:"var(--cyan)" }}>Ops</span><span style={{ color:"var(--text2)" }}>.AI</span>
+            </div>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ fontSize:12, color:"var(--sun2)" }}>☀️ 84°F</div>
+            <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+              <div style={{ width:6, height:6, borderRadius:"50%", background:"var(--green)", animation:"blink 2s infinite" }} />
+              <span className="mono" style={{ fontSize:9, color:"var(--green)", letterSpacing:1 }}>LIVE</span>
+            </div>
+            <div style={{ width:30, height:30, background:"linear-gradient(135deg,var(--cyan),#0050aa)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:12, color:"#fff" }}>JM</div>
+          </div>
+        </div>
+
+        {/* ── BODY ── */}
         <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
-          {/* SIDEBAR */}
-          <div style={{ width:210, background:"var(--bg2)", borderRight:"1px solid var(--border)", display:"flex", flexDirection:"column", padding:"14px 10px", flexShrink:0, overflowY:"auto" }}>
+
+          {/* DESKTOP SIDEBAR */}
+          <div className="desktop-sidebar" style={{ width:210, background:"var(--bg2)", borderRight:"1px solid var(--border)", display:"flex", flexDirection:"column", padding:"14px 10px", flexShrink:0, overflowY:"auto" }}>
             <div className="section-label" style={{ paddingTop:6 }}>Navigation</div>
             {NAV.map(n=>(
               <button key={n.id} className={`nav-link ${tab===n.id?"active":""}`} onClick={()=>setTab(n.id)}>
@@ -1076,9 +1216,8 @@ export default function App() {
                 {n.badge && <span className={`badge ${n.badgeC||""}`}>{n.badge}</span>}
               </button>
             ))}
-
             <div style={{ marginTop:"auto", paddingTop:16, display:"flex", flexDirection:"column", gap:6 }}>
-              <div className="section-label" style={{ paddingTop:0 }}>Site</div>
+              <div className="section-label" style={{ paddingTop:0 }}>Site Status</div>
               <div style={{ padding:"10px 14px", background:"rgba(0,230,118,.06)", border:"1px solid rgba(0,230,118,.15)", borderRadius:10 }}>
                 <div style={{ fontSize:11, color:"var(--green)", fontWeight:600, marginBottom:4 }}>✓ 43 Days Incident-Free</div>
                 <div style={{ fontSize:11, color:"var(--text3)" }}>57.4% complete · 3d ahead</div>
@@ -1089,13 +1228,14 @@ export default function App() {
             </div>
           </div>
 
-          {/* PAGE */}
-          <div style={{ flex:1, padding:24, overflow:"hidden", display:"flex", flexDirection:"column" }}>
-            {/* Page header */}
-            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20, flexShrink:0 }}>
+          {/* PAGE CONTENT */}
+          <div style={{ flex:1, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+
+            {/* Desktop page header */}
+            <div className="desktop-page-header" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 24px 0", flexShrink:0 }}>
               <div>
-                <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:26, fontWeight:700, color:"var(--text)", lineHeight:1 }}>
-                  {NAV.find(n=>n.id===tab)?.icon} {NAV.find(n=>n.id===tab)?.label}
+                <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:26, fontWeight:700, lineHeight:1 }}>
+                  {currentNav?.icon} {currentNav?.label}
                 </div>
                 <div className="mono" style={{ fontSize:10, color:"var(--text3)", marginTop:4, letterSpacing:2 }}>
                   SOLAROPS.AI · {new Date().toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"}).toUpperCase()}
@@ -1103,16 +1243,46 @@ export default function App() {
               </div>
               <div style={{ display:"flex", gap:10 }}>
                 <button className="btn-ghost">🔔 Alerts (4)</button>
-                <button className="btn-ghost">📱 Mobile View</button>
               </div>
             </div>
 
-            {/* Content */}
-            <div style={{ flex:1, overflow:"hidden" }}>
+            {/* Scrollable content area — desktop */}
+            <div style={{ flex:1, padding:24, paddingTop:20, overflow:"hidden" }} className="desktop-content">
               {views[tab]}
             </div>
+
+            {/* Mobile content area */}
+            <div className="mobile-content" style={{ display:"none" }}>
+              {/* Mobile page title */}
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+                <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700 }}>
+                  {currentNav?.icon} {currentNav?.label}
+                </div>
+                <button style={{ background:"rgba(255,71,87,.12)", border:"1px solid rgba(255,71,87,.25)", color:"var(--red)", borderRadius:8, padding:"6px 12px", fontSize:12, fontWeight:700, cursor:"pointer" }}>🚨 SOS</button>
+              </div>
+              {views[tab]}
+            </div>
+
           </div>
         </div>
+
+        {/* ── MOBILE BOTTOM NAV ── */}
+        <nav className="bottom-nav">
+          <div className="bottom-nav-inner">
+            {NAV.map(n=>(
+              <button key={n.id} className={`bottom-nav-btn ${tab===n.id?"active":""}`} onClick={()=>setTab(n.id)}>
+                {n.badge && <span className={`bnav-badge ${n.badgeC||""}`}>{n.badge}</span>}
+                <span className="bnav-icon">{n.icon}</span>
+                <span>{n.label}</span>
+              </button>
+            ))}
+            <button className="bottom-nav-btn" style={{ color:"var(--red)" }}>
+              <span className="bnav-icon">🚨</span>
+              <span>SOS</span>
+            </button>
+          </div>
+        </nav>
+
       </div>
     </>
   );

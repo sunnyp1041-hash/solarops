@@ -1945,7 +1945,7 @@ export default function App() {
     <>
       <style>{G}</style>
       <div style={{ display:"flex", flexDirection:"column", height:"100vh", background:"var(--bg)" }}>
-        <div className="desktop-topbar" style={{ height:56, background:"rgba(7,13,26,.97)", borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 24px", flexShrink:0, backdropFilter:"blur(20px)" }}>
+        <div className="desktop-topbar" style={{ height:56, background:"rgba(7,13,26,.97)", borderBottom:"1px solid var(--border)", alignItems:"center", justifyContent:"space-between", padding:"0 24px", flexShrink:0, backdropFilter:"blur(20px)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <div style={{ width:34, height:34, background:"linear-gradient(135deg,var(--sun),#c97a00)", borderRadius:9, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, animation:"glow 3s ease-in-out infinite", flexShrink:0 }}>☀️</div>
             <div>
@@ -2005,7 +2005,7 @@ export default function App() {
         </div>
 
         <div style={{ display:"flex", flex:1, overflow:"hidden" }}>
-          <div className="desktop-sidebar" style={{ width:210, background:"var(--bg2)", borderRight:"1px solid var(--border)", display:"flex", flexDirection:"column", padding:"14px 10px", flexShrink:0, overflowY:"auto" }}>
+          <div className="desktop-sidebar" style={{ width:210, background:"var(--bg2)", borderRight:"1px solid var(--border)", flexDirection:"column", padding:"14px 10px", flexShrink:0, overflowY:"auto" }}>
             <div className="section-label" style={{ paddingTop:6 }}>Navigation</div>
             {NAV.map(n=>(
               <button key={n.id} className={`nav-link ${tab===n.id?"active":""}`} onClick={()=>setTab(n.id)}>
@@ -2027,7 +2027,7 @@ export default function App() {
           </div>
 
           <div style={{ flex:1, overflow:"hidden", display:"flex", flexDirection:"column" }}>
-            <div className="desktop-page-header" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"16px 24px 0", flexShrink:0 }}>
+            <div className="desktop-page-header" style={{ alignItems:"center", justifyContent:"space-between", padding:"16px 24px 0", flexShrink:0 }}>
               <div>
                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:26, fontWeight:700, lineHeight:1 }}>
                   {currentNav?.icon} {currentNav?.label}

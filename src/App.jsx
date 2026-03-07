@@ -1907,6 +1907,7 @@ function Landing({ onEnter }) {
       </footer>
     </>
   );
+}
 
 /* ═══════════════════════════════════════════
    APP SHELL — LANDING + DASHBOARD

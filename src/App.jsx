@@ -252,6 +252,11 @@ input::placeholder { color: var(--text3); }
 .desktop-layout { display: flex; }
 .mobile-content { display: none; }
 
+/* Dashboard layout */
+.dash-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; height: 100%; overflow: hidden; }
+.dash-left { overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding-right: 4px; }
+.dash-right { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+
 @media (max-width: 768px) {
   body { overflow: auto; }
 
@@ -260,6 +265,11 @@ input::placeholder { color: var(--text3); }
   .desktop-sidebar { display: none !important; }
   .desktop-page-header { display: none !important; }
   .desktop-content { display: none !important; }
+
+  /* Mobile dashboard: single column, right panel hidden */
+  .dash-grid { display: flex; flex-direction: column; height: auto; overflow: visible; }
+  .dash-left { padding-right: 0; }
+  .dash-right { display: none; }
 
   .mobile-topbar { display: flex !important; }
   .bottom-nav { display: block !important; }
@@ -420,9 +430,9 @@ function Dashboard() {
   ];
 
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 340px", gap:20, height:"100%", overflow:"hidden" }}>
+    <div className="dash-grid">
       {/* LEFT */}
-      <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:20, paddingRight:4 }}>
+      <div className="dash-left">
         {/* KPIs */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
           <KpiCard label="Panels Installed" value="4,821" sub="of 8,400 total" trend="↑ +312 today" trendUp color="var(--cyan)" icon="⚡" />
@@ -515,7 +525,7 @@ function Dashboard() {
       </div>
 
       {/* RIGHT PANEL */}
-      <div style={{ display:"flex", flexDirection:"column", gap:16, overflowY:"auto" }}>
+      <div className="dash-right">
         {/* Production Today */}
         <div className="card">
           <div style={{ padding:"18px 20px 14px" }}>

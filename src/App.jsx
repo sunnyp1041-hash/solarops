@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(typeof window !== "undefined" && window.innerWidth <= 768);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
+  return mobile;
+}
+
 /* ═══════════════════════════════════════════
    GLOBAL STYLES
 ═══════════════════════════════════════════ */
@@ -36,6 +46,10 @@ body {
   font-family: 'DM Sans', sans-serif;
   overflow: hidden;
   height: 100vh;
+}
+
+@media (max-width: 768px) {
+  body { overflow: auto; height: 100%; }
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
@@ -411,12 +425,13 @@ function Dashboard() {
     { label:"Zone E – Inverter Pads",pct:0,   detail:"Scheduled next week" },
   ];
 
+  const isMobile = useIsMobile();
   return (
-    <div style={{ display:"grid", gridTemplateColumns:"1fr 340px", gap:20, height:"100%", overflow:"hidden" }}>
+    <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px", gap:20, height:"100%", overflow: isMobile ? "auto" : "hidden" }}>
       {/* LEFT */}
-      <div style={{ overflowY:"auto", display:"flex", flexDirection:"column", gap:20, paddingRight:4 }}>
+      <div style={{ overflowY: isMobile ? "visible" : "auto", display:"flex", flexDirection:"column", gap:16, paddingRight: isMobile ? 0 : 4 }}>
         {/* KPIs */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+        <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
           <KpiCard label="Panels Installed" value="4,821" sub="of 8,400 total" trend="↑ +312 today" trendUp color="var(--cyan)" icon="⚡" />
           <KpiCard label="Completion"       value="57.4%" sub="On schedule"     trend="+2.1% today"   trendUp color="var(--green)" icon="📈" />
           <KpiCard label="Active Crew"      value="34"    sub="of 38 on site"   trend="2 break · 2 travel" color="var(--amber)" icon="👷" />
@@ -486,8 +501,8 @@ function Dashboard() {
         <div className="card" style={{ marginBottom:8 }}>
           <div className="card-header">
             <SectionTitle sub="Today's field tasks">Work Orders</SectionTitle>
-            <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-              <input value={newTask} onChange={e=>setNewTask(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addTask()} placeholder="Add new task…" style={{ width:220, padding:"7px 12px", fontSize:12 }} />
+            <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
+              <input value={newTask} onChange={e=>setNewTask(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addTask()} placeholder="Add new task…" style={{ width: isMobile ? "100%" : 220, padding:"7px 12px", fontSize:12 }} />
               <button className="btn-primary" onClick={addTask}>+ Add</button>
             </div>
           </div>
@@ -507,7 +522,7 @@ function Dashboard() {
       </div>
 
       {/* RIGHT PANEL */}
-      <div style={{ display:"flex", flexDirection:"column", gap:16, overflowY:"auto" }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:16, overflowY: isMobile ? "visible" : "auto" }}>
         {/* Production Today */}
         <div className="card">
           <div style={{ padding:"18px 20px 14px" }}>
@@ -610,6 +625,7 @@ function Dashboard() {
 ═══════════════════════════════════════════ */
 function SiteMap() {
   const [selected, setSelected] = useState(null);
+  const isMobile = useIsMobile();
   const zones = [
     { id:"A", rows:"1–20",   pct:100, panels:1680, workers:0,  color:"var(--green)",  status:"Complete" },
     { id:"B", rows:"21–45",  pct:78,  panels:2100, workers:12, color:"var(--cyan)",   status:"Active" },
@@ -630,7 +646,7 @@ function SiteMap() {
         </div>
         <div style={{ padding:24, display:"flex", flexDirection:"column", gap:16 }}>
           {/* Zone cards */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:14 }}>
+          <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(5,1fr)", gap:14 }}>
             {zones.map(z=>(
               <div key={z.id} onClick={()=>setSelected(s=>s===z.id?null:z.id)}
                 style={{ background:selected===z.id?"rgba(0,210,255,.08)":"rgba(0,0,0,.25)", border:`2px solid ${selected===z.id?z.color:"var(--border)"}`, borderRadius:14, padding:20, cursor:"pointer", transition:"all .2s", textAlign:"center" }}
@@ -657,7 +673,7 @@ function SiteMap() {
                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700, color:sel.color }}>Zone {sel.id} — Detailed View</div>
                 <span className={`pill ${sel.pct===100?"pill-green":sel.pct>50?"pill-cyan":sel.pct>0?"pill-amber":"pill-purple"}`}>{sel.status}</span>
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+              <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
                 {[["Completion",`${sel.pct}%`,sel.color],["Total Panels",sel.panels.toLocaleString(),"var(--text)"],["Active Workers",sel.workers,"var(--amber)"],["Installed",Math.round(sel.panels*sel.pct/100).toLocaleString(),"var(--green)"]].map(([l,v,c])=>(
                   <div key={l} style={{ background:"rgba(0,0,0,.3)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 18px", textAlign:"center" }}>
                     <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:28, fontWeight:700, color:c }}>{v}</div>
@@ -698,6 +714,7 @@ function SiteMap() {
    CREW
 ═══════════════════════════════════════════ */
 function Crew() {
+  const isMobile = useIsMobile();
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
   const allCrew = [
@@ -719,7 +736,7 @@ function Crew() {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
         <KpiCard label="Total On Site" value="38" sub="Checked in today" color="var(--cyan)"   icon="👷" />
         <KpiCard label="Active"        value="34" sub="Currently working" color="var(--green)" icon="✅" />
         <KpiCard label="Issues"        value="1"  sub="Needs attention"   color="var(--red)"   icon="⚠️" />
@@ -769,6 +786,7 @@ function Crew() {
    MATERIALS
 ═══════════════════════════════════════════ */
 function Materials() {
+  const isMobile = useIsMobile();
   const [items, setItems] = useState([
     { name:"Solar Panels (400W)",  sku:"SP-400W",  stock:3579, unit:"panels", min:500,  status:"ok",       reorder:500  },
     { name:"MC4 Connectors",       sku:"MC4-M/F",  stock:214,  unit:"pairs",  min:500,  status:"critical", reorder:1200 },
@@ -791,7 +809,7 @@ function Materials() {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
         <KpiCard label="Items OK"       value="5"  sub="Fully stocked"     color="var(--green)" icon="📦" />
         <KpiCard label="Low Stock"      value="2"  sub="Order soon"        color="var(--amber)" icon="⚠️" />
         <KpiCard label="Critical"       value="1"  sub="Order immediately" color="var(--red)"   icon="🚨" />
@@ -851,6 +869,7 @@ function Materials() {
    REPORTS
 ═══════════════════════════════════════════ */
 function Reports() {
+  const isMobile = useIsMobile();
   const reports = [
     { title:"Daily Production Report",     desc:"Auto-generated from today's panel logs & crew time entries", icon:"📊", tag:"Ready",  tagC:"pill-green",  date:"Today 17:30" },
     { title:"Zone A Completion Package",   desc:"As-builts, inspection photos, QC sign-off documentation",   icon:"✅", tag:"Ready",  tagC:"pill-green",  date:"Mar 6" },
@@ -868,7 +887,7 @@ function Reports() {
         <SectionTitle sub="All project documentation & auto-generated reports">Reports & Documentation</SectionTitle>
         <button className="btn-primary">📊 Generate Custom Report</button>
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: isMobile ? 10 : 14 }}>
         {reports.map((r,i)=>(
           <div key={i} className="card fade-up" style={{ padding:22, cursor:"pointer", transition:"all .2s" }}
             onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(0,210,255,.35)"; e.currentTarget.style.transform="translateY(-2px)"; }}
@@ -897,6 +916,7 @@ function Reports() {
    SAFETY
 ═══════════════════════════════════════════ */
 function Safety() {
+  const isMobile = useIsMobile();
   const [showLog, setShowLog] = useState(false);
   const [incident, setIncident] = useState({ type:"", desc:"", worker:"", zone:"" });
   const crew = [
@@ -913,7 +933,7 @@ function Safety() {
   const sl = { ok:"✓ COMPLIANT", warn:"⚠ REVIEW", critical:"✗ ACTION REQ" };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
         <KpiCard label="Incidents This Month" value="0"  sub="Zero harm target" trend="✓ On target" trendUp color="var(--green)" icon="🦺" />
         <KpiCard label="Near Misses"          value="1"  sub="Reported & logged" color="var(--amber)" icon="⚠️" />
         <KpiCard label="PPE Compliance"       value="97%" sub="1 non-compliant" color="var(--cyan)" icon="⛑️" />
@@ -988,6 +1008,7 @@ function Safety() {
    STRING TESTING
 ═══════════════════════════════════════════ */
 function StringTesting() {
+  const isMobile = useIsMobile();
   const strings = [
     { id:"ZB-S01", zone:"Zone B", eff:99.1, voc:401.2, isc:10.22, status:"pass", tech:"DeShawn Harris", date:"Today 08:12" },
     { id:"ZB-S02", zone:"Zone B", eff:98.7, voc:399.8, isc:10.18, status:"pass", tech:"DeShawn Harris", date:"Today 08:45" },
@@ -1000,7 +1021,7 @@ function StringTesting() {
   ];
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
         <KpiCard label="Strings Tested" value="8"   sub="of 48 total"      color="var(--cyan)"  icon="🔌" />
         <KpiCard label="Pass Rate"      value="87%" sub="7 pass · 1 fail"  color="var(--green)" icon="✅" />
         <KpiCard label="Avg Efficiency" value="96.8%" sub="Target: ≥95%"   color="var(--sun)"   icon="⚡" />
@@ -1042,6 +1063,7 @@ function StringTesting() {
    SCHEDULE
 ═══════════════════════════════════════════ */
 function Schedule() {
+  const isMobile = useIsMobile();
   const weeks = [
     { week:"Feb 24–28", planned:1200, actual:1247, status:"complete" },
     { week:"Mar 3–7",   planned:1400, actual:1326, status:"active" },
@@ -1062,13 +1084,13 @@ function Schedule() {
   ];
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 10 : 14 }}>
         <KpiCard label="Days Ahead"    value="3"    sub="Ahead of schedule" trend="Excellent pace" trendUp color="var(--green)" icon="📅" />
         <KpiCard label="% Complete"    value="57.4%" sub="As of today"      color="var(--cyan)"  icon="📈" />
         <KpiCard label="Est. Complete" value="Mar 25" sub="3 days early"    trend="Original: Mar 28" color="var(--sun)" icon="🏁" />
         <KpiCard label="Weeks Left"    value="3"    sub="to panel complete" color="var(--amber)" icon="⏳" />
       </div>
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 320px", gap:20 }}>
+      <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 320px", gap:20 }}>
         {/* Weekly table */}
         <div className="card fade-up">
           <div className="card-header"><SectionTitle sub="Planned vs actual production">Weekly Schedule</SectionTitle></div>

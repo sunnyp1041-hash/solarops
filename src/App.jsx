@@ -257,6 +257,9 @@ input::placeholder { color: var(--text3); }
 .dash-left { overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding-right: 4px; }
 .dash-right { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
 
+/* KPI grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
 @media (max-width: 768px) {
   body { overflow: auto; }
 
@@ -270,6 +273,9 @@ input::placeholder { color: var(--text3); }
   .dash-grid { display: flex; flex-direction: column; height: auto; overflow: visible; }
   .dash-left { padding-right: 0; }
   .dash-right { display: none; }
+
+  /* KPI grid: 2 columns on mobile */
+  .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
 
   .mobile-topbar { display: flex !important; }
   .bottom-nav { display: block !important; }
@@ -434,7 +440,7 @@ function Dashboard() {
       {/* LEFT */}
       <div className="dash-left">
         {/* KPIs */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+        <div className="kpi-grid">
           <KpiCard label="Panels Installed" value="4,821" sub="of 8,400 total" trend="↑ +312 today" trendUp color="var(--cyan)" icon="⚡" />
           <KpiCard label="Completion"       value="57.4%" sub="On schedule"     trend="+2.1% today"   trendUp color="var(--green)" icon="📈" />
           <KpiCard label="Active Crew"      value="34"    sub="of 38 on site"   trend="2 break · 2 travel" color="var(--amber)" icon="👷" />
@@ -675,7 +681,7 @@ function SiteMap() {
                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:22, fontWeight:700, color:sel.color }}>Zone {sel.id} — Detailed View</div>
                 <span className={`pill ${sel.pct===100?"pill-green":sel.pct>50?"pill-cyan":sel.pct>0?"pill-amber":"pill-purple"}`}>{sel.status}</span>
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+              <div className="kpi-grid">
                 {[["Completion",`${sel.pct}%`,sel.color],["Total Panels",sel.panels.toLocaleString(),"var(--text)"],["Active Workers",sel.workers,"var(--amber)"],["Installed",Math.round(sel.panels*sel.pct/100).toLocaleString(),"var(--green)"]].map(([l,v,c])=>(
                   <div key={l} style={{ background:"rgba(0,0,0,.3)", border:"1px solid var(--border)", borderRadius:12, padding:"16px 18px", textAlign:"center" }}>
                     <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:28, fontWeight:700, color:c }}>{v}</div>
@@ -737,7 +743,7 @@ function Crew() {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div className="kpi-grid">
         <KpiCard label="Total On Site" value="38" sub="Checked in today" color="var(--cyan)"   icon="👷" />
         <KpiCard label="Active"        value="34" sub="Currently working" color="var(--green)" icon="✅" />
         <KpiCard label="Issues"        value="1"  sub="Needs attention"   color="var(--red)"   icon="⚠️" />
@@ -809,7 +815,7 @@ function Materials() {
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div className="kpi-grid">
         <KpiCard label="Items OK"       value="5"  sub="Fully stocked"     color="var(--green)" icon="📦" />
         <KpiCard label="Low Stock"      value="2"  sub="Order soon"        color="var(--amber)" icon="⚠️" />
         <KpiCard label="Critical"       value="1"  sub="Order immediately" color="var(--red)"   icon="🚨" />
@@ -931,7 +937,7 @@ function Safety() {
   const sl = { ok:"✓ COMPLIANT", warn:"⚠ REVIEW", critical:"✗ ACTION REQ" };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div className="kpi-grid">
         <KpiCard label="Incidents This Month" value="0"  sub="Zero harm target" trend="✓ On target" trendUp color="var(--green)" icon="🦺" />
         <KpiCard label="Near Misses"          value="1"  sub="Reported & logged" color="var(--amber)" icon="⚠️" />
         <KpiCard label="PPE Compliance"       value="97%" sub="1 non-compliant" color="var(--cyan)" icon="⛑️" />
@@ -1018,7 +1024,7 @@ function StringTesting() {
   ];
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div className="kpi-grid">
         <KpiCard label="Strings Tested" value="8"   sub="of 48 total"      color="var(--cyan)"  icon="🔌" />
         <KpiCard label="Pass Rate"      value="87%" sub="7 pass · 1 fail"  color="var(--green)" icon="✅" />
         <KpiCard label="Avg Efficiency" value="96.8%" sub="Target: ≥95%"   color="var(--sun)"   icon="⚡" />
@@ -1080,7 +1086,7 @@ function Schedule() {
   ];
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:14 }}>
+      <div className="kpi-grid">
         <KpiCard label="Days Ahead"    value="3"    sub="Ahead of schedule" trend="Excellent pace" trendUp color="var(--green)" icon="📅" />
         <KpiCard label="% Complete"    value="57.4%" sub="As of today"      color="var(--cyan)"  icon="📈" />
         <KpiCard label="Est. Complete" value="Mar 25" sub="3 days early"    trend="Original: Mar 28" color="var(--sun)" icon="🏁" />

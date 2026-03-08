@@ -1922,6 +1922,8 @@ function AuthScreen({ onAuth }) {
     else setSuccess("✅ Password reset email sent! Check your inbox.");
     setLoading(false);
   };
+
+  const handleSubmit = async () => {
     setError(""); setSuccess("");
     if (!email || !password) { setError("Please enter your email and password."); return; }
     if (mode === "signup" && password.length < 6) { setError("Password must be at least 6 characters."); return; }

@@ -1897,8 +1897,25 @@ function AuthScreen({ onAuth }) {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", padding:20, fontFamily:"'DM Sans',sans-serif" }}>
+    <div style={{ minHeight:"100vh", background:"#070D1A", display:"flex", alignItems:"center", justifyContent:"center", padding:20, fontFamily:"'DM Sans',sans-serif" }}>
       <style>{G}</style>
+      <style>{`
+        .auth-input {
+          font-size: 16px !important;
+          background: #0a1628 !important;
+          border: 1px solid rgba(0,210,255,0.25) !important;
+          color: #e2eef9 !important;
+          border-radius: 10px !important;
+          padding: 12px 16px !important;
+          width: 100% !important;
+          outline: none !important;
+          box-shadow: 0 0 0 999px #0a1628 inset !important;
+          -webkit-box-shadow: 0 0 0 999px #0a1628 inset !important;
+          -webkit-text-fill-color: #e2eef9 !important;
+        }
+        .auth-input::placeholder { color: #4E6E8A !important; }
+        .auth-input:focus { border-color: #00D2FF !important; }
+      `}</style>
       <div style={{ width:"100%", maxWidth:420 }}>
         {/* Logo */}
         <div style={{ textAlign:"center", marginBottom:40 }}>
@@ -1922,16 +1939,16 @@ function AuthScreen({ onAuth }) {
             {mode === "signup" && (
               <div>
                 <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>FULL NAME</div>
-                <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your full name" style={{ fontSize:16, background:"#0a1628", border:"1px solid rgba(0,210,255,0.25)", color:"#e2eef9", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none", WebkitTextFillColor:"#e2eef9", boxShadow:"0 0 0 999px #0a1628 inset" }} />
+                <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your full name" className="auth-input" />
               </div>
             )}
             <div>
               <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>EMAIL</div>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" style={{ fontSize:16, background:"#0a1628", border:"1px solid rgba(0,210,255,0.25)", color:"#e2eef9", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none", WebkitTextFillColor:"#e2eef9", boxShadow:"0 0 0 999px #0a1628 inset" }} />
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" className="auth-input" />
             </div>
             <div>
               <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>PASSWORD</div>
-              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} style={{ fontSize:16, background:"#0a1628", border:"1px solid rgba(0,210,255,0.25)", color:"#e2eef9", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none", WebkitTextFillColor:"#e2eef9", boxShadow:"0 0 0 999px #0a1628 inset" }} />
+              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} className="auth-input" />
             </div>
 
             {error && <div style={{ background:"rgba(255,71,87,.1)", border:"1px solid rgba(255,71,87,.3)", borderRadius:9, padding:"10px 14px", fontSize:13, color:"var(--red)", lineHeight:1.5 }}>{error}</div>}

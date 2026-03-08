@@ -164,7 +164,7 @@ tr:hover td { background: rgba(0,210,255,.03); }
 
 .mono { font-family: 'Share Tech Mono', monospace; }
 
-input[type=text], input[type=search], textarea, select {
+input[type=text], input[type=search], input[type=email], input[type=password], textarea, select {
   background: rgba(0,0,0,.35); border: 1px solid var(--border2);
   color: var(--text); border-radius: 9px; outline: none;
   padding: 10px 14px; font-size: 13px; width: 100%;
@@ -340,7 +340,7 @@ input::placeholder { color: var(--text3); }
   .hide-mobile { display: none !important; }
   .mobile-full { width: 100% !important; }
 
-  input[type=text], input[type=search], select {
+  input[type=text], input[type=search], input[type=email], input[type=password], select {
     font-size: 16px !important;
   }
 

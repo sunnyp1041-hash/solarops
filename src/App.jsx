@@ -1944,11 +1944,11 @@ function AuthScreen({ onAuth }) {
             )}
             <div>
               <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>EMAIL</div>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" className="auth-input" />
+              <input type="text" autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" className="auth-input" />
             </div>
             <div>
               <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>PASSWORD</div>
-              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} className="auth-input" />
+              <input type="text" autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} className="auth-input" style={{ WebkitTextSecurity:"disc" }} />
             </div>
 
             {error && <div style={{ background:"rgba(255,71,87,.1)", border:"1px solid rgba(255,71,87,.3)", borderRadius:9, padding:"10px 14px", fontSize:13, color:"var(--red)", lineHeight:1.5 }}>{error}</div>}

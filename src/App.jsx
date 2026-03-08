@@ -1922,16 +1922,16 @@ function AuthScreen({ onAuth }) {
             {mode === "signup" && (
               <div>
                 <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>FULL NAME</div>
-                <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your full name" style={{ fontSize:16, background:"rgba(0,0,0,.35)", border:"1px solid rgba(0,210,255,.2)", color:"var(--text)", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none" }} />
+                <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your full name" style={{ fontSize:16, background:"#0a1628", border:"1px solid rgba(0,210,255,0.25)", color:"#e2eef9", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none", WebkitTextFillColor:"#e2eef9", boxShadow:"0 0 0 999px #0a1628 inset" }} />
               </div>
             )}
             <div>
               <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>EMAIL</div>
-              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" style={{ fontSize:16, background:"rgba(0,0,0,.35)", border:"1px solid rgba(0,210,255,.2)", color:"var(--text)", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none" }} />
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" style={{ fontSize:16, background:"#0a1628", border:"1px solid rgba(0,210,255,0.25)", color:"#e2eef9", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none", WebkitTextFillColor:"#e2eef9", boxShadow:"0 0 0 999px #0a1628 inset" }} />
             </div>
             <div>
               <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>PASSWORD</div>
-              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} style={{ fontSize:16, background:"rgba(0,0,0,.35)", border:"1px solid rgba(0,210,255,.2)", color:"var(--text)", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none" }} />
+              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} style={{ fontSize:16, background:"#0a1628", border:"1px solid rgba(0,210,255,0.25)", color:"#e2eef9", borderRadius:10, padding:"12px 16px", width:"100%", outline:"none", WebkitTextFillColor:"#e2eef9", boxShadow:"0 0 0 999px #0a1628 inset" }} />
             </div>
 
             {error && <div style={{ background:"rgba(255,71,87,.1)", border:"1px solid rgba(255,71,87,.3)", borderRadius:9, padding:"10px 14px", fontSize:13, color:"var(--red)", lineHeight:1.5 }}>{error}</div>}

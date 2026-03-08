@@ -173,6 +173,15 @@ input[type=text], input[type=search], input[type=email], input[type=password], t
 input:focus, textarea:focus, select:focus { border-color: var(--cyan); }
 input::placeholder { color: var(--text3); }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 999px rgba(11,20,40,1) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--text) !important;
+}
+
 .tag {
   display: inline-block; padding: 3px 9px; border-radius: 6px;
   font-size: 11px; font-weight: 600;

@@ -2421,7 +2421,7 @@ export default function App() {
                 <button className="btn-ghost">🔔 Alerts (4)</button>
               </div>
             </div>
-            <div style={{ flex:1, padding:24, paddingTop:20, overflow:"hidden" }} className="desktop-content">
+            <div style={{ flex:1, padding:24, paddingTop:20, overflow:"auto" }} className="desktop-content">
               {views[tab]}
             </div>
           </div>

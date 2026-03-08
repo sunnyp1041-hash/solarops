@@ -1067,7 +1067,7 @@ function Safety() {
   const sp = { ok:"pill-green", warn:"pill-amber", critical:"pill-red" };
   const sl = { ok:"✓ COMPLIANT", warn:"⚠ REVIEW", critical:"✗ ACTION REQ" };
   return (
-    <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto" }}>
+    <div style={{ display:"flex", flexDirection:"column", gap:20, height:"100%", overflowY:"auto", paddingBottom:40 }}>
       <div className="kpi-grid">
         <KpiCard label="Incidents This Month" value="0"  sub="Zero harm target" trend="✓ On target" trendUp color="var(--green)" icon="🦺" />
         <KpiCard label="Near Misses"          value="1"  sub="Reported & logged" color="var(--amber)" icon="⚠️" />
@@ -2385,7 +2385,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="desktop-layout" style={{ flex:1, overflow:"hidden" }}>
+        <div className="desktop-layout" style={{ flex:1, overflow:"hidden", minHeight:0 }}>
           <div className="desktop-sidebar" style={{ width:210, background:"var(--bg2)", borderRight:"1px solid var(--border)", flexDirection:"column", padding:"14px 10px", flexShrink:0, overflowY:"auto" }}>
             <div className="section-label" style={{ paddingTop:6 }}>Navigation</div>
             {NAV.map(n=>(
@@ -2407,7 +2407,7 @@ export default function App() {
             </div>
           </div>
 
-          <div style={{ flex:1, overflow:"hidden", display:"flex", flexDirection:"column" }}>
+          <div style={{ flex:1, overflow:"hidden", minHeight:0, display:"flex", flexDirection:"column" }}>
             <div className="desktop-page-header" style={{ alignItems:"center", justifyContent:"space-between", padding:"16px 24px 0", flexShrink:0 }}>
               <div>
                 <div style={{ fontFamily:"'Rajdhani',sans-serif", fontSize:26, fontWeight:700, lineHeight:1 }}>

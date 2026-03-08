@@ -1,4 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 /* ═══════════════════════════════════════════
    GLOBAL STYLES
@@ -1847,6 +1853,98 @@ function WorkflowVisual({ step }) {
   return visuals[step] || visuals[0];
 }
 
+/* ═══════════════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════════════ */
+function AuthScreen({ onAuth }) {
+  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async () => {
+    setError(""); setSuccess("");
+    if (!email || !password) { setError("Please enter your email and password."); return; }
+    if (mode === "signup" && password.length < 6) { setError("Password must be at least 6 characters."); return; }
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+        if (error) throw error;
+        setSuccess("✅ Check your email to confirm your account, then come back to log in!");
+        setMode("login");
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        onAuth(data.user);
+      }
+    } catch (e) {
+      setError(e.message || "Something went wrong. Please try again.");
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ minHeight:"100vh", background:"var(--bg)", display:"flex", alignItems:"center", justifyContent:"center", padding:20, fontFamily:"'DM Sans',sans-serif" }}>
+      <style>{G}</style>
+      <div style={{ width:"100%", maxWidth:420 }}>
+        {/* Logo */}
+        <div style={{ textAlign:"center", marginBottom:40 }}>
+          <div style={{ width:56, height:56, background:"linear-gradient(135deg,var(--sun),#c97a00)", borderRadius:16, display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, margin:"0 auto 16px", animation:"glow 3s ease-in-out infinite" }}>☀️</div>
+          <div style={{ fontFamily:"'Rajdhani',sans-serif", fontWeight:700, fontSize:32, letterSpacing:.5 }}>
+            <span style={{ color:"var(--sun)" }}>Solar</span><span style={{ color:"var(--cyan)" }}>Ops</span><span style={{ color:"var(--text2)" }}>.AI</span>
+          </div>
+          <div className="mono" style={{ fontSize:10, color:"var(--text3)", letterSpacing:2, marginTop:4 }}>FIELD COMMAND PLATFORM</div>
+        </div>
+
+        {/* Card */}
+        <div className="card" style={{ padding:32 }}>
+          {/* Tabs */}
+          <div style={{ display:"flex", gap:0, marginBottom:28, background:"rgba(0,0,0,.3)", borderRadius:10, padding:4 }}>
+            {[["login","Log In"],["signup","Sign Up"]].map(([m,l])=>(
+              <button key={m} onClick={()=>{ setMode(m); setError(""); setSuccess(""); }} style={{ flex:1, padding:"9px 0", borderRadius:8, border:"none", background:mode===m?"rgba(0,210,255,.12)":"transparent", color:mode===m?"var(--cyan)":"var(--text3)", fontWeight:600, fontSize:14, transition:"all .2s", cursor:"pointer" }}>{l}</button>
+            ))}
+          </div>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+            {mode === "signup" && (
+              <div>
+                <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>FULL NAME</div>
+                <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your full name" style={{ fontSize:16 }} />
+              </div>
+            )}
+            <div>
+              <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>EMAIL</div>
+              <input type="email" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder="you@company.com" style={{ fontSize:16 }} />
+            </div>
+            <div>
+              <div style={{ fontSize:11, color:"var(--text3)", marginBottom:6, fontWeight:600, letterSpacing:.5 }}>PASSWORD</div>
+              <input type="password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleSubmit()} placeholder={mode==="signup"?"Min. 6 characters":"Your password"} style={{ fontSize:16 }} />
+            </div>
+
+            {error && <div style={{ background:"rgba(255,71,87,.1)", border:"1px solid rgba(255,71,87,.3)", borderRadius:9, padding:"10px 14px", fontSize:13, color:"var(--red)", lineHeight:1.5 }}>{error}</div>}
+            {success && <div style={{ background:"rgba(0,230,118,.1)", border:"1px solid rgba(0,230,118,.3)", borderRadius:9, padding:"10px 14px", fontSize:13, color:"var(--green)", lineHeight:1.5 }}>{success}</div>}
+
+            <button onClick={handleSubmit} disabled={loading} style={{ background:"linear-gradient(135deg,var(--sun),#d47d00)", color:"#000", fontWeight:700, fontSize:15, padding:"13px 0", borderRadius:10, border:"none", cursor:loading?"not-allowed":"pointer", marginTop:4, fontFamily:"'Rajdhani',sans-serif", letterSpacing:.5, opacity:loading?0.7:1, transition:"all .2s" }}>
+              {loading ? "Please wait…" : mode==="login" ? "Log In →" : "Create Account →"}
+            </button>
+          </div>
+        </div>
+
+        <div style={{ textAlign:"center", marginTop:20, fontSize:12, color:"var(--text3)" }}>
+          {mode==="login" ? "Don't have an account? " : "Already have an account? "}
+          <button onClick={()=>{ setMode(mode==="login"?"signup":"login"); setError(""); setSuccess(""); }} style={{ background:"none", border:"none", color:"var(--cyan)", cursor:"pointer", fontSize:12, fontWeight:600 }}>
+            {mode==="login" ? "Sign up free" : "Log in"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Landing({ onEnter }) {
   const [scrolled, setScrolled] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
@@ -2095,15 +2193,33 @@ const NAV = [
 ];
 
 export default function App() {
-  const [screen, setScreen] = useState("landing"); // "landing" | "app"
+  const [screen, setScreen] = useState("landing"); // "landing" | "auth" | "app"
   const [tab, setTab] = useState("dashboard");
   const [time, setTime] = useState(new Date());
-  useEffect(() => { const t = setInterval(()=>setTime(new Date()), 1000); return ()=>clearInterval(t); }, []);
+  const [user, setUser] = useState(null);
 
-  // Show landing page
-  if (screen === "landing") {
-    return <Landing onEnter={() => setScreen("app")} />;
-  }
+  useEffect(() => {
+    const t = setInterval(()=>setTime(new Date()), 1000);
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) { setUser(session.user); setScreen("app"); }
+    });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) { setUser(session.user); setScreen("app"); }
+      else { setUser(null); setScreen("landing"); }
+    });
+    return () => { clearInterval(t); subscription.unsubscribe(); };
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setScreen("landing");
+  };
+
+  if (screen === "landing") return <Landing onEnter={() => setScreen("auth")} />;
+  if (screen === "auth") return <AuthScreen onAuth={(u) => { setUser(u); setScreen("app"); }} />;
 
   // Show the app dashboard
   const views = { dashboard:<Dashboard/>, sitemap:<SiteMap/>, crew:<Crew/>, materials:<Materials/>, strings:<StringTesting/>, schedule:<Schedule/>, reports:<Reports/>, safety:<Safety/> };
@@ -2147,13 +2263,13 @@ export default function App() {
               <div style={{ width:7, height:7, borderRadius:"50%", background:"var(--green)", animation:"blink 2s infinite" }} />
               <span className="mono" style={{ fontSize:10, color:"var(--green)", letterSpacing:1 }}>LIVE</span>
             </div>
-            <button onClick={() => setScreen("landing")} style={{ background:"rgba(0,210,255,.08)", border:"1px solid rgba(0,210,255,.2)", color:"var(--cyan)", fontSize:11, borderRadius:8, padding:"5px 12px", cursor:"pointer" }}>← Landing</button>
+            <button onClick={handleSignOut} style={{ background:"rgba(255,71,87,.08)", border:"1px solid rgba(255,71,87,.2)", color:"var(--red)", fontSize:11, borderRadius:8, padding:"5px 12px", cursor:"pointer" }}>Sign Out</button>
             <div style={{ display:"flex", gap:8, alignItems:"center" }}>
               <div style={{ textAlign:"right" }}>
-                <div style={{ fontSize:13, fontWeight:600 }}>J. Martinez</div>
-                <div style={{ fontSize:10, color:"var(--text3)" }}>Site Foreman</div>
+                <div style={{ fontSize:13, fontWeight:600 }}>{user?.user_metadata?.full_name || user?.email?.split("@")[0] || "User"}</div>
+                <div style={{ fontSize:10, color:"var(--text3)" }}>{user?.email}</div>
               </div>
-              <div style={{ width:36, height:36, background:"linear-gradient(135deg,var(--cyan),#0050aa)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:14, color:"#fff" }}>JM</div>
+              <div style={{ width:36, height:36, background:"linear-gradient(135deg,var(--cyan),#0050aa)", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:14, color:"#fff" }}>{(user?.user_metadata?.full_name || user?.email || "U")[0].toUpperCase()}</div>
             </div>
           </div>
         </div>

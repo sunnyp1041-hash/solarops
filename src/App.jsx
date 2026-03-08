@@ -450,9 +450,10 @@ function useLocalState(key, def) {
   return [val, save];
 }
 
-function Dashboard() {
+function Dashboard({ user }) {
   const [alerts, setAlerts] = useLocalState("so_alerts", DEFAULT_ALERTS);
-  const [tasks,  setTasks]  = useLocalState("so_tasks",  DEFAULT_TASKS);
+  const [tasks, setTasks] = useState(DEFAULT_TASKS);
+  const [tasksLoading, setTasksLoading] = useState(true);
   const [newTask, setNewTask] = useState("");
   const [chatMsgs, setChatMsgs] = useState([
     { from:"ai",   text:"Good morning ☀️  Zone A is complete. Today: fix torque issue Zone B Row 28, push Zone C to 200 panels. You're 3 days ahead of schedule — great pace." },
@@ -478,9 +479,37 @@ function Dashboard() {
   };
   useEffect(() => { if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight; }, [chatMsgs]);
 
-  const toggleTask = id => setTasks(tasks.map(x => x.id === id ? { ...x, done: !x.done, active: false } : x));
-  const addTask = () => { if (!newTask.trim()) return; setTasks([...tasks, { id: Date.now(), done:false, active:false, urgent:false, text: newTask, time:"—", p:"med" }]); setNewTask(""); };
-  const deleteTask = id => setTasks(tasks.filter(x => x.id !== id));
+  // Load tasks from Supabase
+  useEffect(() => {
+    if (!user) return;
+    setTasksLoading(true);
+    supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at").then(({ data, error }) => {
+      if (!error && data && data.length > 0) {
+        setTasks(data.map(t => ({ id: t.id, done: t.done, active: false, urgent: t.urgent, text: t.text, time: t.time, p: t.priority })));
+      }
+      setTasksLoading(false);
+    });
+  }, [user]);
+
+  const toggleTask = async (id) => {
+    const task = tasks.find(x => x.id === id);
+    const newDone = !task.done;
+    setTasks(tasks.map(x => x.id === id ? { ...x, done: newDone, active: false } : x));
+    await supabase.from("tasks").update({ done: newDone }).eq("id", id);
+  };
+
+  const addTask = async () => {
+    if (!newTask.trim()) return;
+    const newT = { user_id: user.id, text: newTask, done: false, urgent: false, priority: "med", time: "—" };
+    const { data } = await supabase.from("tasks").insert(newT).select().single();
+    if (data) setTasks([...tasks, { id: data.id, done: false, active: false, urgent: false, text: newTask, time: "—", p: "med" }]);
+    setNewTask("");
+  };
+
+  const deleteTask = async (id) => {
+    setTasks(tasks.filter(x => x.id !== id));
+    await supabase.from("tasks").delete().eq("id", id);
+  };
 
   const pDot = { high:"var(--red)", med:"var(--amber)", low:"var(--green)" };
 
@@ -2248,7 +2277,7 @@ export default function App() {
   if (screen === "auth") return <AuthScreen onAuth={(u) => { setUser(u); setScreen("app"); }} />;
 
   // Show the app dashboard
-  const views = { dashboard:<Dashboard/>, sitemap:<SiteMap/>, crew:<Crew/>, materials:<Materials/>, strings:<StringTesting/>, schedule:<Schedule/>, reports:<Reports/>, safety:<Safety/> };
+  const views = { dashboard:<Dashboard user={user}/>, sitemap:<SiteMap/>, crew:<Crew/>, materials:<Materials/>, strings:<StringTesting/>, schedule:<Schedule/>, reports:<Reports/>, safety:<Safety/> };
   const hh = time.getHours().toString().padStart(2,"0");
   const mm = time.getMinutes().toString().padStart(2,"0");
   const ss = time.getSeconds().toString().padStart(2,"0");
